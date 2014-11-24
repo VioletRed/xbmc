@@ -2,6 +2,7 @@
 testMain
 
 # commonly used editors
+debian
 # vim
 *.swp
 # Eclipse
@@ -18,6 +19,7 @@ testMain
 config.cache
 config.status
 config.log
+build.log
 *.d
 *.depend
 *.pc
