@@ -708,7 +708,7 @@ case $use_platform in
      USE_MMAL=1; AC_DEFINE([HAS_MMAL],[1],["Define to 1 if MMAL libs is enabled"])
      CFLAGS="$CFLAGS"
      CXXFLAGS="$CXXFLAGS"
-     ;;
+     USE_STATIC_FFMPEG=1
 esac
 
 if test "$host_vendor" = "apple"; then
