@@ -986,3 +986,16 @@ lib/cpluff/stamp-h1
 /addons/library.xbmc.pvr/libXBMC_pvr.lib
 
 /pvr-addons
+*.log
+*.bin
+*.rpi
+tools/depends/arm-linux-gnueabihf/
+tools/depends/
+debian
+debian
+config.h.in
+tools/*.sh
+tools/Linux/*.sh
+system/advancedsettings.xml
+tools/Linux/FEH-ARM.py
+tools/Linux/FEH.py
