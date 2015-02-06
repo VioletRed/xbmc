@@ -193,8 +193,7 @@ protected:
   unsigned int m_failedSongsStart;
   int m_iCurrentSong;
   int m_iCurrentPlayList;
-  CPlayList* m_PlaylistMusic;
-  CPlayList* m_PlaylistVideo;
+  CPlayList* m_PlaylistMusicVideo;
   CPlayList* m_PlaylistEmpty;
   REPEAT_STATE m_repeatState[2];
 };

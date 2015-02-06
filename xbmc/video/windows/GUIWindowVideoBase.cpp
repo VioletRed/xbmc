@@ -758,7 +758,7 @@ void CGUIWindowVideoBase::OnQueueItem(int iItem)
   CFileItemList queuedItems;
   AddItemToPlayList(item, queuedItems);
   // if party mode, add items but DONT start playing
-  if (g_partyModeManager.IsEnabled(PARTYMODECONTEXT_VIDEO))
+  if (g_partyModeManager.IsEnabled(PARTYMODECONTEXT_UNKNOWN))
   {
     g_partyModeManager.AddUserSongs(queuedItems, false);
     return;

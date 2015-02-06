@@ -42,8 +42,7 @@ using namespace PLAYLIST;
 
 CPlayListPlayer::CPlayListPlayer(void)
 {
-  m_PlaylistMusic = new CPlayList(PLAYLIST_MUSIC);
-  m_PlaylistVideo = new CPlayList(PLAYLIST_VIDEO);
+  m_PlaylistMusicVideo = new CPlayList(PLAYLIST_MUSIC);
   m_PlaylistEmpty = new CPlayList;
   m_iCurrentSong = -1;
   m_bPlayedFirstFile = false;
@@ -58,8 +57,7 @@ CPlayListPlayer::CPlayListPlayer(void)
 CPlayListPlayer::~CPlayListPlayer(void)
 {
   Clear();
-  delete m_PlaylistMusic;
-  delete m_PlaylistVideo;
+  delete m_PlaylistMusicVideo;
   delete m_PlaylistEmpty;
 }
 
@@ -394,10 +392,8 @@ CPlayList& CPlayListPlayer::GetPlaylist(int iPlaylist)
   switch ( iPlaylist )
   {
   case PLAYLIST_MUSIC:
-    return *m_PlaylistMusic;
-    break;
   case PLAYLIST_VIDEO:
-    return *m_PlaylistVideo;
+    return *m_PlaylistMusicVideo;
     break;
   default:
     m_PlaylistEmpty->Clear();
@@ -411,10 +407,8 @@ const CPlayList& CPlayListPlayer::GetPlaylist(int iPlaylist) const
   switch ( iPlaylist )
   {
   case PLAYLIST_MUSIC:
-    return *m_PlaylistMusic;
-    break;
   case PLAYLIST_VIDEO:
-    return *m_PlaylistVideo;
+    return *m_PlaylistMusicVideo;
     break;
   default:
     // NOTE: This playlist may not be empty if the caller of the non-const version alters it!
@@ -425,10 +419,9 @@ const CPlayList& CPlayListPlayer::GetPlaylist(int iPlaylist) const
 
 int CPlayListPlayer::RemoveDVDItems()
 {
-  int nRemovedM = m_PlaylistMusic->RemoveDVDItems();
-  int nRemovedV = m_PlaylistVideo->RemoveDVDItems();
+  int nRemovedM = m_PlaylistMusicVideo->RemoveDVDItems();
 
-  return nRemovedM + nRemovedV;
+  return nRemovedM;
 }
 
 void CPlayListPlayer::Reset()
@@ -680,10 +673,8 @@ void CPlayListPlayer::Remove(int iPlaylist, int iPosition)
 
 void CPlayListPlayer::Clear()
 {
-  if (m_PlaylistMusic)
-    m_PlaylistMusic->Clear();
-  if (m_PlaylistVideo)
-    m_PlaylistVideo->Clear();
+  if (m_PlaylistMusicVideo)
+    m_PlaylistMusicVideo->Clear();
   if (m_PlaylistEmpty)
     m_PlaylistEmpty->Clear();
 }
