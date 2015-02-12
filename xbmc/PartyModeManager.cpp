@@ -324,8 +324,13 @@ bool CPartyModeManager::AddRandomSongs(int iSongs /* = 0 */)
     {
       iSongsToAdd = (int).7f*iSongs;
       iVidsToAdd = (int).3f*iSongs;
-      while (iSongsToAdd+iVidsToAdd < iSongs) // correct any rounding by adding songs
-        iSongsToAdd++;
+      while (iSongsToAdd + iVidsToAdd < iSongs)
+      {
+        if (rand() % 10 < 7) // 70 % chance of grabbing a song
+          iSongsToAdd++; // correct any rounding by adding songs
+        else
+          iVidsToAdd++; // correct any rounding by adding videos
+      }
     }
   }
 
