@@ -382,6 +382,7 @@ void CAdvancedSettings::Initialize()
   m_guiVisualizeDirtyRegions = false;
   m_guiAlgorithmDirtyRegions = 3;
   m_guiDirtyRegionNoFlipTimeout = 0;
+  m_guiFrameTime = 40; // Default GUI refresh rate at 25 fps
   m_airTunesPort = 36666;
   m_airPlayPort = 36667;
 
@@ -1176,6 +1177,7 @@ void CAdvancedSettings::ParseSettingsFile(const CStdString &file)
     XMLUtils::GetBoolean(pElement, "visualizedirtyregions", m_guiVisualizeDirtyRegions);
     XMLUtils::GetInt(pElement, "algorithmdirtyregions",     m_guiAlgorithmDirtyRegions);
     XMLUtils::GetInt(pElement, "nofliptimeout",             m_guiDirtyRegionNoFlipTimeout);
+    XMLUtils::GetInt(pElement, "frametime",                 m_guiFrameTime);
   }
 
   // load in the settings overrides
