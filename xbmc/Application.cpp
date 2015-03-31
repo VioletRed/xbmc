@@ -1886,7 +1886,7 @@ void CApplication::Render()
 
   bool hasRendered = false;
   bool limitFrames = false;
-  unsigned int singleFrameTime = 10; // default limit 100 fps
+  unsigned int singleFrameTime = 40; // default limit 100 fps
   bool vsync = true;
 
   // Whether externalplayer is playing and we're unfocused
