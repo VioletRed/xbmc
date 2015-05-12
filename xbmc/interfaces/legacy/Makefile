@@ -15,6 +15,7 @@ SRCS=	\
 	LanguageHook.cpp \
 	ListItem.cpp \
 	ModuleXbmc.cpp \
+	ModuleXbmcdb.cpp \
 	ModuleXbmcgui.cpp \
 	ModuleXbmcplugin.cpp \
 	ModuleXbmcvfs.cpp \

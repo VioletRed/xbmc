@@ -85,6 +85,7 @@ namespace PythonBindings {
   void initModule_xbmcplugin(void);
   void initModule_xbmcaddon(void);
   void initModule_xbmcvfs(void);
+  void initModule_xbmcdb(void);
 }
 
 using namespace std;
@@ -102,7 +103,8 @@ static PythonModule PythonModules[] =
     { "xbmc",       initModule_xbmc       },
     { "xbmcplugin", initModule_xbmcplugin },
     { "xbmcaddon",  initModule_xbmcaddon  },
-    { "xbmcvfs",    initModule_xbmcvfs    }
+    { "xbmcvfs",    initModule_xbmcvfs    },
+    { "xbmcdb",     initModule_xbmcdb    }
   };
 
 #define PythonModulesSize sizeof(PythonModules) / sizeof(PythonModule)
