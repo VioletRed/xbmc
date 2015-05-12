@@ -88,6 +88,10 @@ namespace XBMCAddon
        */
       String getPath();
       /**
+       * getFileAndPath() - returns a string.
+       */
+      String getFileAndPath();
+      /**
        * getIMDBNumber() - returns a string.
        */
       String getIMDBNumber();
