@@ -30,6 +30,7 @@
 #include "video/VideoDatabase.h"
 #include "music/MusicDatabase.h"
 #include "URL.h"
+#include "media/MediaType.h"
 
 namespace XBMCAddon
 {
@@ -62,6 +63,7 @@ namespace XBMCAddon
          */
         videodb.Open();
         std::string Path = movieDetails.GetPath();
+        std::string FileNameAndPath = movieDetails.m_strFileNameAndPath;
         if (listItem->item->HasProperty("original_listitem_url"))
         {
           movieDetails.m_strFileNameAndPath = listItem->item->GetProperty(
@@ -70,7 +72,7 @@ namespace XBMCAddon
               "original_listitem_url").asString();
         }
         lResult = videodb.SetDetailsForItem(-1, mediatype, movieDetails, art);
-        movieDetails.m_strFileNameAndPath = Path;
+        movieDetails.m_strFileNameAndPath = FileNameAndPath;
         movieDetails.m_strPath = Path;
         movieDetails.m_iDbId = lResult;
         movieDetails.m_type = mediatype;
@@ -95,64 +97,56 @@ namespace XBMCAddon
       videodb.Close();
     }
 
-    std::vector<XBMCAddon::xbmcgui::ListItem*> getMoviesByWhere(const String& SQLWhere,
-        const String& SQLJoin, const String& SQLFields, const String& SQLOrder,
-        const String& SQLGroup)
+    std::vector<XBMCAddon::xbmcgui::ListItem*> getVideoItemsByWhere(
+        const String& mediaType, const String& SQLWhere, const String& SQLJoin,
+        const String& SQLFields, const String& SQLOrder, const String& SQLGroup)
     {
       CVideoDatabase videodb;
       CVideoDatabase::Filter filter;
-      CFileItemList movieItems;
+      CFileItemList videoItems;
       std::vector<XBMCAddon::xbmcgui::ListItem*> listItems;
+
+      filter.where  = SQLWhere;
+      filter.join   = SQLJoin;
+      filter.order  = SQLOrder;
+      filter.fields = SQLFields;
+      filter.group  = SQLGroup;
+
+      if (!MediaTypes::IsValidMediaType(mediaType))
+        return listItems;
+
+      std::ostringstream baseDbPath;
+      baseDbPath << "videodb://" << MediaTypes::ToPlural(mediaType) << "/titles";
 
       if (!videodb.Open())
         return listItems;
 
-      filter.join = SQLJoin;
-      filter.where = SQLWhere;
-      filter.order = SQLOrder;
-      filter.fields = SQLFields;
-      filter.group = SQLGroup;
-      videodb.GetMoviesByWhere("videodb://movies/titles", filter, movieItems);
+      videodb.GetItems(baseDbPath.str(), videoItems, filter);
       videodb.Close();
-      unsigned i = 0;
-      while(i < movieItems.Size())
+
+      int i = 0;
+      while (i < videoItems.Size())
       {
         /* Copy returned items into a Python-SWIG compatible structure */
         XBMCAddon::xbmcgui::ListItem* item;
-        item = new XBMCAddon::xbmcgui::ListItem(movieItems.Get(i++));
+        item = new XBMCAddon::xbmcgui::ListItem(videoItems.Get(i++));
         listItems.push_back(item);
       }
       return listItems;
     }
 
-    std::vector<XBMCAddon::xbmcgui::ListItem*> getMusicVideosByWhere(const String& SQLWhere,
-        const String& SQLJoin, const String& SQLFields, const String& SQLOrder,
-        const String& SQLGroup)
+    std::vector<XBMCAddon::xbmcgui::ListItem*> getMoviesByWhere(
+        const String& SQLWhere, const String& SQLJoin, const String& SQLFields,
+        const String& SQLOrder, const String& SQLGroup)
     {
-      CVideoDatabase videodb;
-      CVideoDatabase::Filter filter;
-      CFileItemList movieItems;
-      std::vector<XBMCAddon::xbmcgui::ListItem*> listItems;
+      return getVideoItemsByWhere(MediaTypeMovie, SQLWhere, SQLJoin, SQLFields, SQLOrder, SQLGroup);
+    }
 
-      if (!videodb.Open())
-        return listItems;
-
-      filter.join = SQLJoin;
-      filter.where = SQLWhere;
-      filter.order = SQLOrder;
-      filter.fields = SQLFields;
-      filter.group = SQLGroup;
-      videodb.GetMusicVideosByWhere("videodb://musicvideos/titles", filter, movieItems);
-      videodb.Close();
-      unsigned i = 0;
-      while(i < movieItems.Size())
-      {
-        /* Copy returned items into a Python-SWIG compatible structure */
-        XBMCAddon::xbmcgui::ListItem* item;
-        item = new XBMCAddon::xbmcgui::ListItem(movieItems.Get(i++));
-        listItems.push_back(item);
-      }
-      return listItems;
+    std::vector<XBMCAddon::xbmcgui::ListItem*> getMusicVideosByWhere(
+        const String& SQLWhere, const String& SQLJoin, const String& SQLFields,
+        const String& SQLOrder, const String& SQLGroup)
+    {
+      return getVideoItemsByWhere(MediaTypeMusicVideo, SQLWhere, SQLJoin, SQLFields, SQLOrder, SQLGroup);
     }
 
   }
