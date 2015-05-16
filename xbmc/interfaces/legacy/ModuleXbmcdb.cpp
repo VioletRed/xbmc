@@ -142,6 +142,13 @@ namespace XBMCAddon
       return getVideoItemsByWhere(MediaTypeMovie, SQLWhere, SQLJoin, SQLFields, SQLOrder, SQLGroup);
     }
 
+    std::vector<XBMCAddon::xbmcgui::ListItem*> getEpisodesByWhere(
+        const String& SQLWhere, const String& SQLJoin, const String& SQLFields,
+        const String& SQLOrder, const String& SQLGroup)
+    {
+      return getVideoItemsByWhere(MediaTypeEpisode, SQLWhere, SQLJoin, SQLFields, SQLOrder, SQLGroup);
+    }
+
     std::vector<XBMCAddon::xbmcgui::ListItem*> getMusicVideosByWhere(
         const String& SQLWhere, const String& SQLJoin, const String& SQLFields,
         const String& SQLOrder, const String& SQLGroup)

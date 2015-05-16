@@ -43,7 +43,9 @@ namespace XBMCAddon
      * lititem     : ListItem - Item to be added
      *
      * example:
-     *   - xbmcplugin.addItemtoDb("musicvideo", listitem)
+     *   - xbmcdb.addItemtoDb("tvshow", listitem) # Create a new TVShow entry
+     *   - xbmcdb.addItemtoDB("season", listitem) # Create a season for the show
+     *   - xbmcdb.addItemtoDb("episode", listitem) # Add a new episode
      */
     int addItemtoVideoDb(const String& mediatype,
         const XBMCAddon::xbmcgui::ListItem* listItem);
@@ -79,6 +81,18 @@ namespace XBMCAddon
      *   - xbmcplugin.getMoviesByWhere("name like '%mymovie%')
      */
     std::vector<XBMCAddon::xbmcgui::ListItem*> getMoviesByWhere(
+        const String& SQLWhere, const String& SQLJoin = emptyString,
+        const String& SQLFields = emptyString, const String& SQLOrder =
+            emptyString, const String& SQLGroup = emptyString);
+
+    /**
+     * getEpisodesByWhere(where, join, fields, order, group) -- Run a SQL query in videodb
+     * where        : string - Basic SQL statement
+     *
+     * example:
+     *   - xbmcplugin.getEpisodesByWhere("name like '%mymovie%')
+     */
+    std::vector<XBMCAddon::xbmcgui::ListItem*> getEpisodesByWhere(
         const String& SQLWhere, const String& SQLJoin = emptyString,
         const String& SQLFields = emptyString, const String& SQLOrder =
             emptyString, const String& SQLGroup = emptyString);
