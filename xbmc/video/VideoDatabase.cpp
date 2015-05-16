@@ -172,6 +172,14 @@ void CVideoDatabase::CreateTables()
   columns += ")";
   m_pDS->exec(columns.c_str());
 
+  CLog::Log(LOGINFO, "create videos table");
+  columns = "CREATE TABLE video ( idMVideo integer primary key, idFile integer";
+  for (int i = 0; i < VIDEODB_MAX_COLUMNS; i++)
+    columns += StringUtils::Format(",c%02d text", i);;
+
+  columns += ")";
+  m_pDS->exec(columns.c_str());
+
   CLog::Log(LOGINFO, "create streaminfo table");
   m_pDS->exec("CREATE TABLE streamdetails (idFile integer, iStreamType integer, "
     "strVideoCodec text, fVideoAspect float, iVideoWidth integer, iVideoHeight integer, "
@@ -431,6 +439,27 @@ void CVideoDatabase::CreateViews()
   CLog::Log(LOGINFO, "create movie_view");
   m_pDS->exec("CREATE VIEW movie_view AS SELECT"
               "  movie.*,"
+              "  sets.strSet AS strSet,"
+              "  files.strFileName AS strFileName,"
+              "  path.strPath AS strPath,"
+              "  files.playCount AS playCount,"
+              "  files.lastPlayed AS lastPlayed, "
+              "  files.dateAdded AS dateAdded, "
+              "  bookmark.timeInSeconds AS resumeTimeInSeconds, "
+              "  bookmark.totalTimeInSeconds AS totalTimeInSeconds "
+              "FROM movie"
+              "  LEFT JOIN sets ON"
+              "    sets.idSet = movie.idSet"
+              "  JOIN files ON"
+              "    files.idFile=movie.idFile"
+              "  JOIN path ON"
+              "    path.idPath=files.idPath"
+              "  LEFT JOIN bookmark ON"
+              "    bookmark.idFile=movie.idFile AND bookmark.type=1");
+
+  CLog::Log(LOGINFO, "create video_view");
+  m_pDS->exec("CREATE VIEW video_view AS SELECT"
+              "  video.*,"
               "  sets.strSet AS strSet,"
               "  files.strFileName AS strFileName,"
               "  path.strPath AS strPath,"
