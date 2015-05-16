@@ -1123,6 +1123,8 @@ void CGUIWindowVideoBase::GetContextButtons(int itemNumber, CContextButtons &but
       }
       if (item->IsSmartPlayList() || m_vecItems->IsSmartPlayList())
         buttons.Add(CONTEXT_BUTTON_EDIT_SMART_PLAYLIST, 586);
+      if (!item->IsVideoDb())
+        buttons.Add(CONTEXT_BUTTON_ADD_TO_LIBRARY, 527);
     }
   }
   CGUIMediaWindow::GetContextButtons(itemNumber, buttons);
@@ -1309,6 +1311,9 @@ bool CGUIWindowVideoBase::OnContextButton(int itemNumber, CONTEXT_BUTTON button)
     return OnPlayAndQueueMedia(item);
   case CONTEXT_BUTTON_PLAY_ONLY_THIS:
     return OnPlayMedia(itemNumber);
+  case CONTEXT_BUTTON_ADD_TO_LIBRARY:
+    AddToDatabase(itemNumber);
+    return true;
   default:
     break;
   }
@@ -1667,8 +1672,13 @@ void CGUIWindowVideoBase::AddToDatabase(int iItem)
   if (pItem->IsParentFolder() || pItem->m_bIsFolder)
     return;
 
-  CVideoInfoTag movie;
-  movie.Reset();
+  CVideoInfoTag& movie = *(pItem->GetVideoInfoTag());
+  // movie.Reset();
+
+  // ensure the art map isn't completely empty by specifying an empty thumb
+  map<string, string> art = pItem->GetArt();
+  if (art.empty())
+    art["thumb"] = "";
 
   // prompt for data
   // enter a new title
@@ -1676,45 +1686,68 @@ void CGUIWindowVideoBase::AddToDatabase(int iItem)
   if (!CGUIKeyboardFactory::ShowAndGetInput(strTitle, g_localizeStrings.Get(528), false)) // Enter Title
     return;
 
-  // pick genre
-  CGUIDialogSelect* pSelect = (CGUIDialogSelect*)g_windowManager.GetWindow(WINDOW_DIALOG_SELECT);
-  if (!pSelect)
-    return;
-
-  pSelect->SetHeading(530); // Select Genre
-  pSelect->Reset();
-  CFileItemList items;
-  if (!CDirectory::GetDirectory("videodb://movies/genres/", items))
-    return;
-  pSelect->SetItems(&items);
-  pSelect->EnableButton(true, 531); // New Genre
-  pSelect->DoModal();
-  std::string strGenre;
-  int iSelected = pSelect->GetSelectedLabel();
-  if (iSelected >= 0)
-    strGenre = items[iSelected]->GetLabel();
-  else if (!pSelect->IsButtonPressed())
-    return;
-
-  // enter new genre string
-  if (strGenre.empty())
+  // Items of unknown type will be stored as movies
+  if (pItem->GetVideoInfoTag()->m_type == MediaTypeNone)
   {
-    strGenre = g_localizeStrings.Get(532); // Manual Addition
-    if (!CGUIKeyboardFactory::ShowAndGetInput(strGenre, g_localizeStrings.Get(533), false)) // Enter Genre
-      return; // user backed out
+    pItem->GetVideoInfoTag()->m_type = MediaTypeMovie;
+  }
+
+  // pick genre
+  if (pItem->GetVideoInfoTag()->m_genre.empty() && pItem->GetVideoInfoTag()->m_type == MediaTypeMovie)
+  {
+    CGUIDialogSelect* pSelect = (CGUIDialogSelect*) g_windowManager.GetWindow(
+        WINDOW_DIALOG_SELECT);
+    if (!pSelect)
+      return;
+
+    pSelect->SetHeading(530); // Select Genre
+    pSelect->Reset();
+    CFileItemList items;
+    if (!CDirectory::GetDirectory("videodb://movies/genres/", items))
+      return;
+    pSelect->SetItems(&items);
+    pSelect->EnableButton(true, 531); // New Genre
+    pSelect->DoModal();
+    std::string strGenre;
+    int iSelected = pSelect->GetSelectedLabel();
+    if (iSelected >= 0)
+      strGenre = items[iSelected]->GetLabel();
+    else if (!pSelect->IsButtonPressed())
+      return;
+
+    // enter new genre string
     if (strGenre.empty())
-      return; // no genre string
+    {
+      strGenre = g_localizeStrings.Get(532); // Manual Addition
+      if (!CGUIKeyboardFactory::ShowAndGetInput(strGenre,
+          g_localizeStrings.Get(533), false)) // Enter Genre
+        return; // user backed out
+      if (strGenre.empty())
+        return; // no genre string
+    }
+    movie.m_genre = StringUtils::Split(strGenre, g_advancedSettings.m_videoItemSeparator);
   }
 
   // set movie info
   movie.m_strTitle = strTitle;
-  movie.m_genre = StringUtils::Split(strGenre, g_advancedSettings.m_videoItemSeparator);
 
   // everything is ok, so add to database
   m_database.Open();
-  int idMovie = m_database.AddMovie(pItem->GetPath());
+  if (movie.m_strFileNameAndPath.empty())
+    movie.m_strFileNameAndPath = pItem->GetPath();
+  std::string Path = movie.GetPath();
+  std::string FileNameAndPath = movie.m_strFileNameAndPath;
+  if (pItem->HasProperty("original_listitem_url"))
+  {
+    movie.m_strFileNameAndPath = pItem->GetProperty("original_listitem_url").asString();
+    movie.m_strPath = pItem->GetProperty("original_listitem_url").asString();
+  }
+  int idMovie = m_database.SetDetailsForItem(-1, pItem->GetVideoInfoTag()->m_type, movie, art);
+  movie.m_strFileNameAndPath = FileNameAndPath;
+  movie.m_strPath = Path;
+  movie.m_iDbId = idMovie;
   movie.m_strIMDBNumber = StringUtils::Format("xx%08i", idMovie);
-  m_database.SetDetailsForMovie(pItem->GetPath(), movie, pItem->GetArt());
+  movie.m_type = pItem->GetVideoInfoTag()->m_type;
   m_database.Close();
 
   // done...
