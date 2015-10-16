@@ -24,7 +24,6 @@
   #include "config.h"
 #endif
 #ifdef TARGET_WINDOWS
-#define TIXML_USE_STL
 #pragma comment(lib, "tinyxmlSTL.lib")
 #else
 //compile fix for TinyXml < 2.6.0

@@ -323,7 +323,7 @@ if test "$use_platform" = "raspberry-pi"; then
    -Wno-deprecated-declarations -isystem${use_firmware}/opt/vc/include \
    -isystem${use_firmware}/opt/vc/include/interface/vcos/pthreads \
    -isystem${use_firmware}/opt/vc/include/interface/vmcs_host/linux"
-  platform_cxxflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s \
+  platform_cxxflags="-pipe -mcpu=arm1176jzf-s -mtune=arm1176jzf-s -std=gnu++11\
    -mfloat-abi=hard -mfpu=vfp -mabi=aapcs-linux -Wno-psabi \
    -Wa,-mno-warn-deprecated -Wno-deprecated-declarations \
    -isystem${use_firmware}/opt/vc/include \
